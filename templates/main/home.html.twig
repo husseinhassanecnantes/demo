@@ -1,37 +1,6 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=yes, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Hello world</h1>
+{% extends "base.html.twig" %}
+{% block title %}
+{% endblock %}
 
-    {# ceci est un commentaire #}
-    {% set name = "Ali" %}
-    <p>{{ name }}</p>
-
-    {% set colors = ['red', 'blue', 'green', 'purple'] %}
-
-    {% for color in colors %}
-    <div style="background-color: {{ color }}; padding: 5px; margin: 5px;">{{ color }}</div>
-    {% else %}
-    <p>Pas de coleurs</p>
-    {% endfor %}
-
-    {% set book = {
-        'author':'Sammy',
-        'year' : 2018,
-        'title' : 'Symfony'
-    } %}
-
-    {% for key, value in book %}
-    <dl>
-        <dt>{{ key }}:</dt><dd>{{ value }}</dd>
-    </dl>
-    {% endfor %}
-</body>
-</html>
+{% block body %}
+{% endblock %}
