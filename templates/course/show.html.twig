@@ -2,9 +2,15 @@
 
 {% block body %}
 Afficher détails de cours
+    <dl>
+        <dt>Titre</dt>
+        <dd>{{ course.name }}</dd>
+        <dt>Durée</dt>
+        <dd>{{ course.duration }}</dd>
+    </dl>
 {% endblock %}
 
 {% block title %}
-{# titre du cours #} | {{ parent() }}
+{{ course.name}} | {{ parent() }}
 {% endblock %}
 
