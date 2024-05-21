@@ -35,7 +35,9 @@ class Course
     public function __construct()
     {
         $this->published = false;
+        $this->setDateCreated(new \DateTimeImmutable());
     }
+
 
     public function getId(): ?int
     {

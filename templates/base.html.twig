@@ -21,6 +21,15 @@
         {{ include('_navbar.html.twig') }}
     </header>
     <main class="flex-grow-1">
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
         {% block body %}{% endblock %}
     </main>
     <footer class="text-center my-4">

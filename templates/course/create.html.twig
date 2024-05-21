@@ -2,6 +2,10 @@
 
 {% block body %}
 Création d'un cours
+{{ form_start(formCourse) }}
+{{ form_widget(formCourse) }}
+<button class="btn btn-primary btn-sm">Ajouter</button>
+{{ form_end(formCourse) }}
 {% endblock %}
 
 {% block title %}
