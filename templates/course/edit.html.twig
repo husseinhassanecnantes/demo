@@ -4,6 +4,13 @@
     {{ course.name }}
     {{ form_start(formCourse) }}
     {{ form_widget(formCourse) }}
+
+    {% if course.filename %}
+        <div class="my-5" style="width: 400px; height: 400px;">
+            <img style="width: 100%; height: 100%; " src="{{ asset('uploads/files/'~course.filename) }}" alt="{{ course.name }}">
+        </div>
+    {% endif %}
+
     <button class="btn btn-primary btn-sm">Sauvegarder</button>
     {{ form_end(formCourse) }}
 {% endblock %}

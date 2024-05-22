@@ -7,9 +7,11 @@ use App\Form\CourseType;
 use App\Repository\CourseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/cours')]
 class CourseController extends AbstractController
@@ -17,10 +19,10 @@ class CourseController extends AbstractController
     #[Route('/', name: 'course_list', methods: ['GET'])]
     public function list(CourseRepository $courseRepository): Response
     {
-       // $courses = $courseRepository->findBy(['published' => true], ['name' => 'ASC'], 25);
+        $courses = $courseRepository->findBy(['published' => true], ['dateCreated' => 'DESC'], 25);
       //  $duration = 20;
       //  $courses = $courseRepository->findLastCourses($duration);
-        $courses = $courseRepository->findAll();
+       // $courses = $courseRepository->findAll();
         return $this->render('course/list.html.twig', [
             "courses" => $courses,
         ]);
@@ -39,7 +41,7 @@ class CourseController extends AbstractController
     }
 
     #[Route('/creer', name: 'course_create', methods: ['GET','POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $course = new Course();
         $formCourse = $this->createForm(CourseType::class,$course);
@@ -48,9 +50,23 @@ class CourseController extends AbstractController
 
         if($formCourse->isSubmitted() && $formCourse->isValid())
         {
+            $courseFile = $formCourse->get('file')->getData();
+
+            if ($courseFile) {
+                $originalFilename = pathinfo($courseFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $courseFile->guessExtension();
+
+                try {
+                    $courseFile->move($this->getParameter('files_directory'), $newFilename);
+                    $course->setFilename($newFilename);
+                } catch (FileException $e) {
+                    dd($e);
+                }
+            }
+
             $em->persist($course);
             $em->flush();
-
             $this->addFlash('success', 'Le cours a été bien créé!');
             return $this->redirectToRoute('course_show',['id' => $course->getId()]);
         }
@@ -60,14 +76,37 @@ class CourseController extends AbstractController
     }
 
     #[Route('/{id}/modifier', name: 'course_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Course $course, Request $request, EntityManagerInterface $em): Response
+    public function edit(Course $course, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
-        $formCourse = $this->createForm(CourseType::class,$course);
+        $formCourse = $this->createForm(CourseType::class, $course);
 
         $formCourse->handleRequest($request);
 
         if($formCourse->isSubmitted() && $formCourse->isValid())
         {
+
+            if($formCourse->has('deleteCb') && $formCourse->get('deleteCb')->getData())
+            {
+                unlink($this->getParameter('files_directory') . '/' . $course->getFilename());
+                $course->setFilename(null);
+            }
+
+            $courseFile = $formCourse->get('file')->getData();
+
+            if ($courseFile && $course->getFilename() === null)
+            {
+                $originalFilename = pathinfo($courseFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $courseFile->guessExtension();
+
+                try {
+                    $courseFile->move($this->getParameter('files_directory'), $newFilename);
+                    $course->setFilename($newFilename);
+                } catch (FileException $e) {
+                    dd($e);
+                }
+            }
+
             $course->setDateModified(new \DateTimeImmutable());
             $em->persist($course);
             $em->flush();

@@ -8,10 +8,16 @@ Afficher détails de cours
         <dt>Durée</dt>
         <dd>{{ course.duration }}</dd>
         <dt>Description</dt>
-        <dd>{{ course.content }}</dd>
+        <dd>{{ course.content | nl2br }}</dd>
         <dt>Date Création</dt>
-        <dd>{{ course.dateCreated | format_datetime(locale='fr',pattern="EEEE dd MMMM YYYY")|capitalize}}</dd>
+        <dd>{{ course.dateCreated | format_datetime(pattern="EEEE dd MMMM YYYY '-' hh a m 'minutes'", locale='fr') | capitalize}}</dd>
+        <dd>{{ course.dateCreated | date('d/m/y H:i')}}</dd>
     </dl>
+    {% if course.filename %}
+        <div class="my-5" style="width: 400px; height: 400px;">
+            <img style="width: 100%; height: 100%; " src="{{ asset('uploads/files/'~course.filename) }}" alt="{{ course.name }}">
+        </div>
+    {% endif %}
     <div>
         <a href="{{ path('course_edit', {'id': course.id}) }}" class="btn btn-primary">Modifier</a>
         <a href="{{ path('course_delete', {'id': course.id, 'token': csrf_token('delete-token-'~course.id)}) }}" class="btn btn-danger">Supprimer</a>
