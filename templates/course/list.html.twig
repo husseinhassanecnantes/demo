@@ -7,9 +7,10 @@
         <thead>
             <tr>
                 <th>Titre</th>
-                <th>Durée</th>
+                <th>Durée (jours)</th>
                 <th>Publié</th>
                 <th>Date de création</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -17,8 +18,9 @@
             <tr>
                 <td><a href="{{ path('course_show', {id: course.id}) }}">{{ course.name }}</a> </td>
                 <td>{{ course.duration }}</td>
-                <td>{{ course.published }}</td>
-                <td>{{ course.dateCreated | date('y-m-d') }}</td>
+                <td>{{ course.published ? 'Oui' : 'Non' }}</td>
+                <td>{{ course.dateCreated | date('d-m-Y') }}</td>
+                <td><a href="{{ path('course_edit', {'id' : course.id}) }}">Modifier</a></td>
             </tr>
         {% endfor %}
         </tbody>

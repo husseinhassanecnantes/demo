@@ -7,7 +7,15 @@ Afficher détails de cours
         <dd>{{ course.name }}</dd>
         <dt>Durée</dt>
         <dd>{{ course.duration }}</dd>
+        <dt>Description</dt>
+        <dd>{{ course.content }}</dd>
+        <dt>Date Création</dt>
+        <dd>{{ course.dateCreated | format_datetime(locale='fr',pattern="EEEE dd MMMM YYYY")|capitalize}}</dd>
     </dl>
+    <div>
+        <a href="{{ path('course_edit', {'id': course.id}) }}" class="btn btn-primary">Modifier</a>
+        <a href="{{ path('course_delete', {'id': course.id, 'token': csrf_token('delete-token-'~course.id)}) }}" class="btn btn-danger">Supprimer</a>
+    </div>
 {% endblock %}
 
 {% block title %}

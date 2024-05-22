@@ -1,10 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-Modification un cours
+    {{ course.name }}
+    {{ form_start(formCourse) }}
+    {{ form_widget(formCourse) }}
+    <button class="btn btn-primary btn-sm">Sauvegarder</button>
+    {{ form_end(formCourse) }}
 {% endblock %}
 
 {% block title %}
-Modifier un cours | {{ parent() }}
+    Modification du cours | {{ parent() }}
 {% endblock %}
 

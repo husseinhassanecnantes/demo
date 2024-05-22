@@ -46,7 +46,7 @@ class CourseController extends AbstractController
 
         $formCourse->handleRequest($request);
 
-        if($formCourse->isSubmitted())
+        if($formCourse->isSubmitted() && $formCourse->isValid())
         {
             $em->persist($course);
             $em->flush();
@@ -60,12 +60,42 @@ class CourseController extends AbstractController
     }
 
     #[Route('/{id}/modifier', name: 'course_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(int $id): Response
+    public function edit(Course $course, Request $request, EntityManagerInterface $em): Response
     {
-        // todo: traiter le formulaire de modification de cours
+        $formCourse = $this->createForm(CourseType::class,$course);
+
+        $formCourse->handleRequest($request);
+
+        if($formCourse->isSubmitted() && $formCourse->isValid())
+        {
+            $course->setDateModified(new \DateTimeImmutable());
+            $em->persist($course);
+            $em->flush();
+
+            $this->addFlash('success', 'Le cours a été bien modifié!');
+            return $this->redirectToRoute('course_show',['id' => $course->getId()]);
+        }
         return $this->render('course/edit.html.twig', [
-            // todo : passe le formulaire à twig
+            'course' => $course,
+            'formCourse' => $formCourse
         ]);
+    }
+
+    #[Route('/{id}/delete/{token}', name: 'course_delete', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function delete(Course $course,string $token, EntityManagerInterface $em): Response
+    {
+        $verifiedToken = $this->isCsrfTokenValid('delete-token-'.$course->getId(), $token);
+
+        if($verifiedToken)
+        {
+            $em->remove($course);
+            $em->flush();
+            $this->addFlash('success', 'Cours a été supprimé!');
+            return $this->redirectToRoute('course_list');
+        }
+
+        $this->addFlash('danger', 'La suppression du cours a été échouée');
+        return $this->redirectToRoute('course_show', ['id' => $course->getId()]);
     }
 
     #[Route('/demo')]
