@@ -4,9 +4,10 @@ namespace App\DataFixtures;
 
 use App\Entity\Course;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class AppFixtures extends Fixture
+class CourseFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -21,15 +22,27 @@ class AppFixtures extends Fixture
             $dateCreated = $faker->dateTimeBetween('-2 years','now');
             $course->setDateCreated(\DateTimeImmutable::createFromMutable($dateCreated));
             $course->setDuration($faker->numberBetween(1,30));
-
             $dateModified = $faker->optional()->dateTimeBetween($dateCreated);
             if($dateModified)
             {
                 $course->setDateModified(\DateTimeImmutable::createFromMutable($dateModified));
             }
 
+            $course->setCategory($this->getReference('cat'.$faker->numberBetween(1,10)));
+
+            $nb = $faker->numberBetween(1,5);
+            for($t = 1; $t <= $nb; $t++)
+            {
+                $course->addTrainer($this->getReference('trainer'.$faker->numberBetween(1,10)));
+            }
+
             $manager->persist($course);
         }
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [CategoryFixtures::class, TrainerFixtures::class];
     }
 }
