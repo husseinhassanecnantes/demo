@@ -60,7 +60,7 @@ class Course
     /**
      * @var Collection<int, Trainer>
      */
-    #[ORM\ManyToMany(targetEntity: Trainer::class, mappedBy: 'courses')]
+    #[ORM\ManyToMany(targetEntity: Trainer::class, inversedBy: 'courses')]
     private Collection $trainers;
 
     public function __construct()

@@ -33,7 +33,7 @@ class Trainer
     /**
      * @var Collection<int, Course>
      */
-    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'trainers')]
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'trainers')]
     private Collection $courses;
 
     public function __construct()
@@ -116,5 +116,10 @@ class Trainer
         $this->courses->removeElement($course);
 
         return $this;
+    }
+
+    public function getFullname()
+    {
+        return $this->firstname . " " . $this->lastname;
     }
 }

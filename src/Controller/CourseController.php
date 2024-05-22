@@ -19,9 +19,9 @@ class CourseController extends AbstractController
     #[Route('/', name: 'course_list', methods: ['GET'])]
     public function list(CourseRepository $courseRepository): Response
     {
-        $courses = $courseRepository->findBy(['published' => true], ['dateCreated' => 'DESC'], 25);
-      //  $duration = 20;
-      //  $courses = $courseRepository->findLastCourses($duration);
+        //$courses = $courseRepository->findBy(['published' => true], ['dateCreated' => 'DESC'], 25);
+        $duration = 2;
+        $courses = $courseRepository->findLastCourses($duration);
        // $courses = $courseRepository->findAll();
         return $this->render('course/list.html.twig', [
             "courses" => $courses,
@@ -121,7 +121,7 @@ class CourseController extends AbstractController
     }
 
     #[Route('/{id}/delete/{token}', name: 'course_delete', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function delete(Course $course,string $token, EntityManagerInterface $em): Response
+    public function delete(Course $course, string $token, EntityManagerInterface $em): Response
     {
         $verifiedToken = $this->isCsrfTokenValid('delete-token-'.$course->getId(), $token);
 

@@ -12,6 +12,17 @@ Afficher détails de cours
         <dt>Date Création</dt>
         <dd>{{ course.dateCreated | format_datetime(pattern="EEEE dd MMMM YYYY '-' hh a m 'minutes'", locale='fr') | capitalize}}</dd>
         <dd>{{ course.dateCreated | date('d/m/y H:i')}}</dd>
+
+        <dt>Catégorie</dt>
+        <dd>{{ course.category.name }}</dd>
+        <dt>Liste des formateurs</dt>
+        <dd>
+            <ul>
+                {% for trainer in course.trainers %}
+                 <li>{{ trainer.firstname }} {{ trainer.lastname }}</li>
+                {% endfor %}
+            </ul>
+        </dd>
     </dl>
     {% if course.filename %}
         <div class="my-5" style="width: 400px; height: 400px;">
