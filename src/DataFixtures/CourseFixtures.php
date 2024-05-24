@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Course;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -29,7 +30,7 @@ class CourseFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $course->setCategory($this->getReference('cat'.$faker->numberBetween(1,10)));
-
+            $course->setUser($this->getReference('user'.$faker->numberBetween(1,20)));
             $nb = $faker->numberBetween(1,5);
             for($t = 1; $t <= $nb; $t++)
             {
@@ -43,6 +44,6 @@ class CourseFixtures extends Fixture implements DependentFixtureInterface
 
     public function getDependencies()
     {
-        return [CategoryFixtures::class, TrainerFixtures::class];
+        return [CategoryFixtures::class, TrainerFixtures::class, UserFixtures::class];
     }
 }

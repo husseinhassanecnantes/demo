@@ -35,7 +35,7 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
 
-        for ($i = 1; $i<20; $i++)
+        for ($i = 1; $i<=20; $i++)
         {
             $user = new User();
             $user->setEmail("user$i@eni.fr");
@@ -43,7 +43,7 @@ class UserFixtures extends Fixture
             $user->setFirstname($faker->firstName);
             $user->setRoles(['ROLE_USER']);
             $user->setPassword($this->userPasswordHasher->hashPassword($user, '123456'));
-
+            $this->addReference('user'.$i, $user );
             $manager->persist($user);
         }
 

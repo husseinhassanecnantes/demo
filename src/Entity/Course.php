@@ -63,6 +63,9 @@ class Course
     #[ORM\ManyToMany(targetEntity: Trainer::class, inversedBy: 'courses')]
     private Collection $trainers;
 
+    #[ORM\ManyToOne(inversedBy: 'courses')]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->published = false;
@@ -195,6 +198,18 @@ class Course
         if ($this->trainers->removeElement($trainer)) {
             $trainer->removeCourse($this);
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

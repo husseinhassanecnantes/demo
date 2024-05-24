@@ -65,7 +65,7 @@ class CourseController extends AbstractController
                     dd($e);
                 }
             }
-
+            $course->setUser($this->getUser());
             $em->persist($course);
             $em->flush();
             $this->addFlash('success', 'Le cours a été bien créé!');
@@ -79,6 +79,16 @@ class CourseController extends AbstractController
     #[Route('/{id}/modifier', name: 'course_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Course $course, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
+        if(!$this->getUser())
+        {
+           throw $this->createAccessDeniedException('vous êtes pas connecté');
+        }
+
+        if($this->getUser() !== $course->getUser())
+        {
+            throw $this->createAccessDeniedException('vous devez être le créateur du cours');
+        }
+
         $formCourse = $this->createForm(CourseType::class, $course);
 
         $formCourse->handleRequest($request);
@@ -124,6 +134,11 @@ class CourseController extends AbstractController
     #[Route('/{id}/delete/{token}', name: 'course_delete', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function delete(Course $course, string $token, EntityManagerInterface $em): Response
     {
+        if($this->getUser() !== $course->getUser() && !$this->isGranted('ROLE_ADMIN'))
+        {
+            throw $this->createAccessDeniedException('vous devez être le créateur du cours ou un admin');
+        }
+
         $verifiedToken = $this->isCsrfTokenValid('delete-token-'.$course->getId(), $token);
 
         if($verifiedToken)

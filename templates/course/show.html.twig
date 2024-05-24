@@ -30,8 +30,13 @@ Afficher détails de cours
         </div>
     {% endif %}
     <div>
-        <a href="{{ path('course_edit', {'id': course.id}) }}" class="btn btn-primary">Modifier</a>
-        <a href="{{ path('course_delete', {'id': course.id, 'token': csrf_token('delete-token-'~course.id)}) }}" class="btn btn-danger">Supprimer</a>
+        {% if app.user == course.user %}
+            <a href="{{ path('course_edit', {'id': course.id}) }}" class="btn btn-primary">Modifier</a>
+        {% endif %}
+        {% if app.user == course.user or is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('course_delete', {'id': course.id, 'token': csrf_token('delete-token-'~course.id)}) }}" class="btn btn-danger">Supprimer</a>
+        {% endif %}
+
     </div>
 {% endblock %}
 
