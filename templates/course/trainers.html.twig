@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Liste des formateurs pour le cours
+{% endblock %}
+
+{% block body %}
+    <h1>Liste des formateurs</h1>
+    <ul>
+        {% for trainer in trainers %}
+            <li>{{ trainer.fullname }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+

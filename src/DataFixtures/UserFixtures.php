@@ -26,6 +26,15 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
 
+        $user = new User();
+        $user->setEmail('planner@eni.fr');
+        $user->setLastname("plannernat");
+        $user->setFirstname("plannerou");
+        $user->setRoles(['ROLE_PLANNER']);
+        $user->setPassword($this->userPasswordHasher->hashPassword($user, '123456'));
+
+        $manager->persist($user);
+
         for ($i = 1; $i<20; $i++)
         {
             $user = new User();

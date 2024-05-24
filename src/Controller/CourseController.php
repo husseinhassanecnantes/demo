@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/cours')]
@@ -155,5 +156,13 @@ class CourseController extends AbstractController
         return $this->render('course/edit.html.twig', [
             // todo : passe le formulaire à twig
         ]);
+    }
+
+    #[Route('/{id}/formateurs', name: 'course_trainers', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_PLANNER')]
+    public function trainer(Course $course): Response
+    {
+        $trainers = $course->getTrainers();
+        return $this->render('course/trainers.html.twig', ['trainers' => $trainers, 'course' => $course]);
     }
 }

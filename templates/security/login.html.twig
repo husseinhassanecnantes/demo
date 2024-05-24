@@ -20,12 +20,20 @@
     <label for="inputPassword">Password</label>
     <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
+    <label>
+        <input type="checkbox" name="_remember_me" checked>
+        Keep me logged in
+    </label>
+
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}"
     >
+    <div>
+        <button class="btn btn-lg btn-primary" type="submit">
+            Sign in
+        </button>
+    </div>
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
+    <a href="{{ path('app_forgot_password_request') }}">Vous avez oublié le mot du passe!</a>
 </form>
 {% endblock %}
