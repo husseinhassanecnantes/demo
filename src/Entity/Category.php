@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[UniqueEntity('name', message: 'Cette catégorie existe déjà')]
@@ -15,6 +16,7 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getCategories', 'getCategoriesFull'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -25,9 +27,11 @@ class Category
         minMessage: 'La catégorie devrait avoir au moins 2 caractères',
         maxMessage: 'La catégorie devrait avoir maximum 180 caractères'
     )]
+    #[Groups(['getCategories', 'getCategoriesFull'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['getCategories', 'getCategoriesFull'])]
     private ?\DateTimeImmutable $dateCreated = null;
 
     #[ORM\Column(nullable: true)]
@@ -37,11 +41,13 @@ class Category
      * @var Collection<int, Course>
      */
     #[ORM\OneToMany(targetEntity: Course::class, mappedBy: 'category')]
+    #[Groups(['getCategoriesFull'])]
     private Collection $courses;
 
     public function __construct()
     {
         $this->courses = new ArrayCollection();
+        $this->dateCreated = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

@@ -5,14 +5,13 @@ namespace App\Controller;
 use App\Entity\Course;
 use App\Form\CourseType;
 use App\Repository\CourseRepository;
+use App\Util\Uploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/cours')]
 class CourseController extends AbstractController
@@ -42,7 +41,7 @@ class CourseController extends AbstractController
     }
 
     #[Route('/creer', name: 'course_create', methods: ['GET','POST'])]
-    public function create(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function create(Request $request, EntityManagerInterface $em, Uploader $uploader): Response
     {
         $course = new Course();
         $formCourse = $this->createForm(CourseType::class,$course);
@@ -54,16 +53,8 @@ class CourseController extends AbstractController
             $courseFile = $formCourse->get('file')->getData();
 
             if ($courseFile) {
-                $originalFilename = pathinfo($courseFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $courseFile->guessExtension();
-
-                try {
-                    $courseFile->move($this->getParameter('files_directory'), $newFilename);
-                    $course->setFilename($newFilename);
-                } catch (FileException $e) {
-                    dd($e);
-                }
+                $newFilename =  $uploader->upload($courseFile);
+                $course->setFilename($newFilename);
             }
             $course->setUser($this->getUser());
             $em->persist($course);
@@ -77,7 +68,7 @@ class CourseController extends AbstractController
     }
 
     #[Route('/{id}/modifier', name: 'course_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Course $course, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function edit(Course $course, Request $request, EntityManagerInterface $em, Uploader $uploader): Response
     {
         if(!$this->getUser())
         {
@@ -106,16 +97,8 @@ class CourseController extends AbstractController
 
             if ($courseFile && $course->getFilename() === null)
             {
-                $originalFilename = pathinfo($courseFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $courseFile->guessExtension();
-
-                try {
-                    $courseFile->move($this->getParameter('files_directory'), $newFilename);
-                    $course->setFilename($newFilename);
-                } catch (FileException $e) {
-                    dd($e);
-                }
+                $newFilename =  $uploader->upload($courseFile);
+                $course->setFilename($newFilename);
             }
 
             $course->setDateModified(new \DateTimeImmutable());

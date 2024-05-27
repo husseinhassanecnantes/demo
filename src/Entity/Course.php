@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
@@ -17,6 +18,7 @@ class Course
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getCategoriesFull'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -27,6 +29,7 @@ class Course
         minMessage: 'Le titre du cours devra avoir au moins 2 caractères',
         maxMessage: 'Le titre du cours devra avoir maximum 180 caractères'
     )]
+    #[Groups(['getCategoriesFull'])]
     private ?string $name = null;
 
     #[Assert\Length(
@@ -36,22 +39,27 @@ class Course
         maxMessage: 'Le contenu du cours devra avoir maximum 2000 caractères'
     )]
     #[ORM\Column(type:Types::TEXT, nullable: true)]
+    #[Groups(['getCategoriesFull'])]
     private ?string $content = null;
 
     #[Assert\Range(notInRangeMessage: 'Le cours devrait durer entre 1 et 50 jours', min: 1, max: 50)]
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['getCategoriesFull'])]
     private ?int $duration;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Groups(['getCategoriesFull'])]
     private ?bool $published = null;
 
     #[ORM\Column]
+    #[Groups(['getCategoriesFull'])]
     private ?\DateTimeImmutable $dateCreated = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dateModified = null;
 
     #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['getCategoriesFull'])]
     private ?string $filename = null;
 
     #[ORM\ManyToOne(inversedBy: 'courses')]
