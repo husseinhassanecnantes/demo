@@ -18,7 +18,7 @@ class Course
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -29,7 +29,7 @@ class Course
         minMessage: 'Le titre du cours devra avoir au moins 2 caractères',
         maxMessage: 'Le titre du cours devra avoir maximum 180 caractères'
     )]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?string $name = null;
 
     #[Assert\Length(
@@ -39,27 +39,28 @@ class Course
         maxMessage: 'Le contenu du cours devra avoir maximum 2000 caractères'
     )]
     #[ORM\Column(type:Types::TEXT, nullable: true)]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?string $content = null;
 
     #[Assert\Range(notInRangeMessage: 'Le cours devrait durer entre 1 et 50 jours', min: 1, max: 50)]
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    #[Groups(['getCategoriesFull'])]
-    private ?int $duration;
+    #[Groups(['getCategoriesFull', 'getCourses'])]
+    #[Assert\NotBlank(message: 'Veuillez saisir une duration pour ce cours!')]
+    private ?int $duration = null;
 
     #[ORM\Column(options: ['default' => false])]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?bool $published = null;
 
     #[ORM\Column]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?\DateTimeImmutable $dateCreated = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dateModified = null;
 
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['getCategoriesFull'])]
+    #[Groups(['getCategoriesFull', 'getCourses'])]
     private ?string $filename = null;
 
     #[ORM\ManyToOne(inversedBy: 'courses')]

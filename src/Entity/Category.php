@@ -2,6 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\Model\CategoryDTO;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +14,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
+#[ApiResource(
+    operations: [
+        new Get(normalizationContext: ['groups' => 'getCategoriesFull']),
+        new GetCollection(normalizationContext: ['groups' => 'getCategories']),
+        new Post(denormalizationContext: ['groups' => 'postCategory'])
+    ]
+)]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[UniqueEntity('name', message: 'Cette catégorie existe déjà')]
 class Category
@@ -27,7 +40,7 @@ class Category
         minMessage: 'La catégorie devrait avoir au moins 2 caractères',
         maxMessage: 'La catégorie devrait avoir maximum 180 caractères'
     )]
-    #[Groups(['getCategories', 'getCategoriesFull'])]
+    #[Groups(['getCategories', 'getCategoriesFull', 'postCategory'])]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -125,4 +138,12 @@ class Category
     {
         return $this->name;
     }
+
+    public static function createfromDTO(CategoryDTO $dto): self
+    {
+        $category = new self();
+        $category->setName($dto->name);
+        return $category;
+    }
+
 }

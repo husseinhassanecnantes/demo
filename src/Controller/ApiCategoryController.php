@@ -4,18 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Form\CategoryType;
+use App\Model\CategoryDTO;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 
 class ApiCategoryController extends AbstractController
 {
@@ -43,13 +44,22 @@ class ApiCategoryController extends AbstractController
 
     #[Route('/api/categories', name: 'api_category_create', methods: ['POST'])]
     public function create(
+        #[MapRequestPayload] CategoryDTO $categoryDTO,
         Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $entityManager,
         ValidatorInterface $validator
     ): JsonResponse
     {
+        // méthode 3 en utilisant un DTO
+        $category = Category::createfromDTO($categoryDTO);
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        return $this->json($category, JsonResponse::HTTP_CREATED, [], []);
+
         /*
+         * // méthode 1 en utilisant validator
         $data = $request->getContent();
         $category = $serializer->deserialize($data, Category::class, 'json');
 
@@ -64,8 +74,13 @@ class ApiCategoryController extends AbstractController
             }
             return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
+
+        $entityManager->persist($category);
+        $entityManager->flush();
          */
 
+        /*
+        * // méthode 2 en utilisant un formulaire
         $data = json_decode($request->getContent(), true);
         $category = new Category();
 
@@ -85,7 +100,8 @@ class ApiCategoryController extends AbstractController
 
         $entityManager->persist($category);
         $entityManager->flush();
-
+         *
+         */
         return $this->json($category, JsonResponse::HTTP_CREATED, ["Location" => $this->generateUrl(
             'api_category_read',
             ['id' => $category->getId()],
@@ -142,7 +158,7 @@ class ApiCategoryController extends AbstractController
         $entityManager->persist($category);
         $entityManager->flush();
 
-        return $this->json($category, JsonResponse::HTTP_OK);
+        return $this->json($category, JsonResponse::HTTP_OK, [], ['groups' => 'getCategories']);
     }
 
     #[Route('/api/categories/{id}', name: 'api_category_patch', requirements: ['id' => '\d+'], methods: ['PATCH'])]
@@ -195,7 +211,7 @@ class ApiCategoryController extends AbstractController
         $entityManager->persist($category);
         $entityManager->flush();
 
-        return $this->json($category, JsonResponse::HTTP_OK);
+        return $this->json($category, JsonResponse::HTTP_OK, [], ['groups' => 'getCategories']);
     }
 
     #[Route('/api/categories/{id}', name: 'api_category_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
