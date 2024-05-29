@@ -30,3 +30,8 @@ services:
             $logger: '@logger'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.exception', method: '__invoke' }
+
+when@test:
+    services:
+        App\Util\Truncator:
+            public: true
